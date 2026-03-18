@@ -1,78 +1,401 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-TW">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
       crossorigin="anonymous"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
     <title>篩檢預先填寫系統</title>
+    <style>
+      body {
+        font-family: 'Noto Sans TC', sans-serif;
+        /* 淡雅的漸層背景 */
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-h-screen;
+        display: flex;
+        flex-direction: column;
+      }
+      .main-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+      }
+      .form-card {
+        background-color: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* 柔和的陰影 */
+        padding: 2.5rem;
+        max-width: 600px;
+        width: 100%;
+      }
+      header h1 {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+      /* 優化輸入框樣式 */
+      .form-floating > .form-control:focus ~ label,
+      .form-floating > .form-control:not(:placeholder-shown) ~ label,
+      .form-floating > .form-select ~ label {
+        color: #0d6efd; /* 聚焦時 label 變色 */
+      }
+      .form-control, .form-select {
+        border-radius: 10px;
+        border: 1px solid #ced4da;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      }
+      .form-control:focus, .form-select:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+      }
+      /* 按鈕樣式優化 */
+      .submit-btn {
+        border-radius: 10px;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+        font-weight: 500;
+        font-size: 1.1rem;
+        transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+      }
+      .submit-btn:hover {
+        transform: translateY(-2px); /* hover 時微微上浮 */
+        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+      }
+      .submit-btn:active {
+        transform: translateY(1px);
+      }
+
+      /* Modal 樣式美化 */
+      .modal-content {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+      }
+      .modal-header {
+        border-bottom: none;
+        padding: 1.5rem 1.5rem 0.5rem;
+      }
+      .modal-title {
+        font-weight: 700;
+        color: #0d6efd;
+      }
+      .modal-body {
+        padding: 1rem 1.5rem 1.5rem;
+      }
+      .modal-body h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #333;
+        text-align: center;
+      }
+      .modal-body h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        color: #555;
+      }
+      .modal-body p, .modal-body ul {
+        font-size: 0.9rem;
+        color: #666;
+        line-height: 1.6;
+      }
+      .footer-note {
+        margin-top: 1.5rem;
+        font-weight: 500;
+        color: #444;
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #0d6efd;
+      }
+      .modal-footer {
+        border-top: none;
+        padding: 0.5rem 1.5rem 1.5rem;
+      }
+      .close-modal {
+        border-radius: 8px;
+        font-weight: 500;
+      }
+    </style>
   </head>
   <body>
-    <header class="mt-3 d-flex justify-content-center">
-      <h1>資料預填系統</h1>
-    </header>
-    <section class="mx-3">
-      <div class="form-floating mb-3">
-        <input
-          type="text"
-          class="form-control"
-          id="floatingInput"
-          placeholder="請輸入姓名"
-        />
-        <label for="floatingInput">姓名</label>
+    <div class="main-container container">
+      <div class="form-card">
+        <header>
+          <h1>資料預填系統</h1>
+        </header>
+        <section>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="inputName"
+              placeholder="請輸入姓名"
+            />
+            <label for="inputName">姓名</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="inputId"
+              placeholder="請輸入身分證字號"
+            />
+            <label for="inputId">身分證字號</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="date"
+              class="form-control"
+              id="inputBirthday"
+              placeholder="請輸入生日"
+            />
+            <label for="inputBirthday">生日</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="inputPhone"
+              placeholder="請輸入電話"
+            />
+            <label for="inputPhone">電話</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="inputAddress"
+              placeholder="請輸入住址"
+            />
+            <label for="inputAddress">住址(可收到信件通知的地址)</label>
+          </div>
+          <div class="form-floating mb-4">
+            <select
+              class="form-select"
+              id="inputEducation"
+              aria-label="Floating label select example"
+            >
+              <option selected disabled>請選擇您的學歷</option>
+              <option value="無">無</option>
+              <option value="小學">小學</option>
+              <option value="國(初)中">國(初)中</option>
+              <option value="高中(職)">高中(職)</option>
+              <option value="專科、大學">專科、大學</option>
+              <option value="研究所以上">研究所以上</option>
+            </select>
+            <label for="inputEducation">學歷</label>
+          </div>
+        </section>
+        <button type="submit" class="btn btn-primary w-100 submit-btn">
+          送出資料
+        </button>
       </div>
-      <div class="form-floating mb-3">
-        <input
-          type="text"
-          class="form-control"
-          id="floatingPassword"
-          placeholder="請輸入身分證字號"
-        />
-        <label for="floatingPassword">身分證字號</label>
+    </div>
+
+    <div
+      class="modal fade"
+      id="myModal"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+      tabindex="-1"
+      aria-labelledby="staticBackdropLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-body">
+            <article>
+              <h2>
+                龍潭敏盛醫院「整合性篩檢服務」<br />個人資料蒐集、處理及利用告知書
+              </h2>
+
+              <p class="intro">
+                感謝您參與本院辦理之整合性篩檢服務。為保障您的權益，龍潭敏盛醫院（以下簡稱本院）依據個人資料保護法第
+                8 條規定，向您告知下列事項：
+              </p>
+
+              <section>
+                <h3>一、 蒐集之目的</h3>
+                <p>
+                  本院蒐集您個人資料之目的，係為了辦理整合性健康篩檢服務、後續健康追蹤管理、檢查結果通知、醫療服務優化及相關衛生教育資訊之提供。
+                </p>
+              </section>
+
+              <section>
+                <h3>二、 蒐集之個人資料類別</h3>
+                <p>
+                  包含但不限於：姓名、身分證字號（或護照號碼）、出生年月日、聯絡電話、通訊地址等資料。
+                </p>
+              </section>
+
+              <section>
+                <h3>三、 利用之期間、地區、對象及方式</h3>
+                <ul>
+                  <li>
+                    <strong>期間：</strong
+                    >於上述蒐集目的之存續期間，或依相關法規（如醫療法、病歷管理辦法）規定之保存期限。
+                  </li>
+                  <li>
+                    <strong>地區：</strong
+                    >中華民國境內（含醫院內部、主管機關及受委託執行業務之機構）。
+                  </li>
+                  <li>
+                    <strong>對象：</strong
+                    >本院、衛生主管機關（如桃園市政府衛生局、衛福部）及與本院合作之醫療技術單位。
+                  </li>
+                  <li>
+                    <strong>方式：</strong
+                    >以紙本、電子文件或其他自動化機器進行符合蒐集目的之處理與利用。
+                  </li>
+                </ul>
+              </section>
+
+              <section>
+                <h3>四、 您得行使之權利</h3>
+                <p>
+                  依據個資法第 3 條，您對本院所保有之個人資料得行使下列權利：
+                </p>
+                <ul>
+                  <li>查詢、請求閱覽或請求製給複製本。</li>
+                  <li>請求補充或更正。</li>
+                  <li>
+                    請求停止蒐集、處理或利用，或請求刪除（惟本院因執行業務或法規所必須者，得不予准許）。
+                  </li>
+                </ul>
+              </section>
+
+              <section>
+                <h3>五、 不提供個人資料所致之影響</h3>
+                <p>
+                  您可自由選擇是否提供相關個人資料，惟若您拒絕提供、或提供之資料不完整，本院將可能無法為您提供完整之篩檢服務、結果通知或後續醫療補助作業。
+                </p>
+              </section>
+
+              <div class="footer-note">
+                本人已充分瞭解上述告知事項，並同意龍潭敏盛醫院於所述目的範圍內，蒐集、處理及利用本人之個人資料。
+              </div>
+            </article>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary close-modal w-100">
+              我同意，開始填寫
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="form-floating mb-3">
-        <input
-          type="text"
-          class="form-control"
-          id="floatingPassword"
-          placeholder="請輸入生日"
-        />
-        <label for="floatingPassword">生日</label>
-      </div>
-      <div class="form-floating mb-3">
-        <input
-          type="text"
-          class="form-control"
-          id="floatingPassword"
-          placeholder="請輸入住址"
-        />
-        <label for="floatingPassword">住址(可收到信件通知的地址)</label>
-      </div>
-      <div class="form-floating">
-        <select
-          class="form-select"
-          id="floatingSelect"
-          aria-label="Floating label select example"
-        >
-          <option selected>請選擇您的學歷</option>
-          <option value="無">無</option>
-          <option value="小學">小學</option>
-          <option value="國中">國(初)中</option>
-          <option value="高中">高中(職)</option>
-          <option value="專科">專科、大學</option>
-          <option value="研究所以上">研究所以上</option>
-        </select>
-        <label for="floatingSelect">學歷</label>
-      </div>
-    </section>
+    </div>
   </body>
   <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     crossorigin="anonymous"
   ></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    const inputName = document.getElementById("inputName")
+    const inputId = document.getElementById("inputId")
+    const inputBirthday = document.getElementById("inputBirthday")
+    const inputPhone = document.getElementById("inputPhone")
+    const inputAddress = document.getElementById("inputAddress")
+    const inputEducation = document.getElementById("inputEducation")
+    const submitButton = document.querySelector(".submit-btn")
+
+    submitButton.addEventListener("click", (e) => {
+      e.preventDefault() // 防止表單提交後頁面刷新
+      const nameValue = inputName.value
+      const idValue = inputId.value
+      const birthdayValue = inputBirthday.value
+      const phoneValue = inputPhone.value
+      const addressValue = inputAddress.value
+      const educationValue = inputEducation.value
+
+      // 簡單的欄位檢查
+      if (
+        !nameValue ||
+        !idValue ||
+        !birthdayValue ||
+        !phoneValue ||
+        !addressValue ||
+        educationValue === "請選擇您的學歷"
+      ) {
+        Swal.fire({
+          icon: "warning",
+          title: "哎呀！",
+          text: "請確認所有欄位都已填寫完畢",
+          confirmButtonText: "好，我知道了",
+          confirmButtonColor: "#0d6efd",
+        })
+        return
+      }
+
+      Swal.fire({
+        title: "資料傳送中...",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading()
+        },
+      })
+
+      const data = {
+        name: nameValue,
+        idNumber: idValue,
+        birth: birthdayValue,
+        phone: phoneValue,
+        address: addressValue,
+        education: educationValue,
+      }
+      axios
+        .post("https://webapi-qw6m.onrender.com/person", data)
+        .then(() => {
+          window.location.href = "finally.html"
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "提交失敗",
+            text: "伺服器暫時沒有回應，請稍後再試。",
+            confirmButtonText: "重試",
+            confirmButtonColor: "#dc3545",
+          })
+        })
+    })
+
+    window.addEventListener("DOMContentLoaded", () => {
+      if (!window.bootstrap || !window.bootstrap.Modal) {
+        console.error("Bootstrap JS 尚未載入，無法啟用 modal")
+        return
+      }
+
+      const modalElement = document.getElementById("myModal")
+      const modal = new bootstrap.Modal(modalElement)
+      modal.show()
+
+      document.querySelector(".close-modal").addEventListener("click", (event) => {
+        event.currentTarget.blur()
+        const currentModal = bootstrap.Modal.getInstance(modalElement)
+        if (currentModal) {
+          currentModal.hide()
+        }
+      })
+
+      modalElement.addEventListener("hidden.bs.modal", () => {
+        inputName.focus()
+      })
+    })
+  </script>
 </html>
