@@ -314,6 +314,24 @@
     const inputAddress = document.getElementById("inputAddress")
     const inputEducation = document.getElementById("inputEducation")
     const submitButton = document.querySelector(".submit-btn")
+    const modalElement = document.getElementById("myModal")
+
+    const resetFormState = () => {
+      inputName.value = ""
+      inputId.value = ""
+      inputBirthday.value = ""
+      inputPhone.value = ""
+      inputAddress.value = ""
+      inputEducation.selectedIndex = 0
+    }
+
+    const showStartModal = () => {
+      if (!window.bootstrap || !window.bootstrap.Modal) {
+        return
+      }
+      const modal = bootstrap.Modal.getOrCreateInstance(modalElement)
+      modal.show()
+    }
 
     submitButton.addEventListener("click", (e) => {
       e.preventDefault() // 防止表單提交後頁面刷新
@@ -381,9 +399,7 @@
         return
       }
 
-      const modalElement = document.getElementById("myModal")
-      const modal = new bootstrap.Modal(modalElement)
-      modal.show()
+      showStartModal()
 
       document.querySelector(".close-modal").addEventListener("click", (event) => {
         event.currentTarget.blur()
@@ -396,6 +412,20 @@
       modalElement.addEventListener("hidden.bs.modal", () => {
         inputName.focus()
       })
+    })
+
+    window.addEventListener("pageshow", (event) => {
+      const navigationEntries = performance.getEntriesByType("navigation")
+      const isBackForward =
+        event.persisted ||
+        (navigationEntries.length > 0 && navigationEntries[0].type === "back_forward")
+
+      if (!isBackForward) {
+        return
+      }
+
+      resetFormState()
+      showStartModal()
     })
   </script>
 </html>
